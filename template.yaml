@@ -1,0 +1,61 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  serverless-ecommerce-etl-pipeline
+
+  Sample SAM Template for serverless-ecommerce-etl-pipeline
+
+# Global settings for all functions
+Globals:
+  Function:
+    Timeout: 60 # seconds
+
+Resources:
+  # S3 Bucket to store the raw e-commerce data
+  ECommerceDataSourceBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "ecommerce-data-source-bucket-${AWS::AccountId}"
+
+  # Lambda Function that performs the ETL
+  ETLPipelineFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: handler.etl_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Metadata:
+        BuildMethod: python_pip
+        BuildProperties:
+          RequirementsFile: ../requirements/base.txt
+      # Environment variables for the database connection
+      Environment:
+        Variables:
+          DB_HOST: "your-db-host" # <-- Replace with your DB host
+          DB_NAME: "your-db-name" # <-- Replace with your DB name
+          DB_USER: "your-db-user" # <-- Replace with your DB user
+          DB_PASSWORD: "your-db-password" # <-- Replace with your DB password
+          DB_PORT: "5432" # <-- Replace with your DB port
+      # IAM policy to grant read access to the S3 bucket
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Ref ECommerceDataSourceBucket
+      # Event source mapping to trigger the Lambda from S3
+      Events:
+        S3Event:
+          Type: S3
+          Properties:
+            Bucket: !Ref ECommerceDataSourceBucket
+            Events: s3:ObjectCreated:*
+
+Outputs:
+  # The name of the S3 bucket created
+  ECommerceBucketName:
+    Description: "S3 bucket for e-commerce data"
+    Value: !Ref ECommerceDataSourceBucket
+  # The ARN of the Lambda function
+  ETLFunctionArn:
+    Description: "ARN of the ETL Lambda function"
+    Value: !GetAtt ETLPipelineFunction.Arn
