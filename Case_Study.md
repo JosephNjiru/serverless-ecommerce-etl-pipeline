@@ -39,3 +39,37 @@ Create total_price: A new column, total_price, must be calculated by multiplying
 The Desired Outcome:
 A clean, structured sales_transactions table in the PostgreSQL data warehouse that is automatically updated daily. This table will be the single source of truth for all sales-related reporting and will directly feed into the company's daily performance dashboards used by the leadership team.
 
+---
+
+## Automated Pipeline Implementation
+
+This project now includes:
+
+- **Synthetic Data Generation:** `src/generate_sales_csv.py` creates a realistic `sales.csv` file with 1,000,000 records for testing and reproducibility.
+- **Data Validation:** `src/validate_sales_csv.py` checks the structure and sample values of the generated CSV file.
+- **Automated ETL:** `src/handler.py` implements the transformation logic and can be deployed as an AWS Lambda function.
+- **Schema Definition:** `src/sql/create_tables.sql` defines the target table for Redshift/PostgreSQL.
+- **Unit Testing:** `tests/test_handler.py` validates transformation logic against business rules.
+
+## Data Schema
+| Field Name        | Data Type      | Description                       |
+|-------------------|---------------|-----------------------------------|
+| transaction_id    | INT           | Unique transaction identifier     |
+| order_id          | INT           | Order identifier                  |
+| customer_id       | INT           | Customer identifier (-1 if blank) |
+| product_id        | INT           | Product identifier                |
+| order_date        | TIMESTAMP     | Date and time of transaction      |
+| quantity          | INT           | Number of units sold              |
+| unit_price        | NUMERIC(10,2) | Price per unit                    |
+| product_category  | VARCHAR(50)   | Standardized product category     |
+| total_price       | NUMERIC(10,2) | Calculated total order value      |
+
+## How to Reproduce
+1. Generate sample data: `python src/generate_sales_csv.py`
+2. Validate sample data: `python src/validate_sales_csv.py`
+3. Run unit tests: `pytest tests/test_handler.py`
+4. Deploy infrastructure: Use `template.yaml` with AWS SAM/CloudFormation
+
+---
+
+For more details, see the README and the full journal article in LaTeX/PDF format.

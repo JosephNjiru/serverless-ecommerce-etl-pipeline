@@ -48,6 +48,90 @@ Python	Core programming language for the ETL logic.
 Pandas	Python library for efficient data manipulation and transformation.
 Boto3	AWS SDK for Python, used to interact with S3.
 Psycopg2	PostgreSQL adapter for Python to connect and load data.
+Faker	Synthetic data generation for testing and reproducibility.
+Numpy	Efficient numeric operations for data generation and transformation.
+
+## Updated Project Structure
+
+```
+serverless-ecommerce-etl-pipeline/
+├── README.md
+├── Case_Study.md
+├── requirements/
+│   ├── base.txt
+│   └── dev.txt
+├── src/
+│   ├── generate_sales_csv.py      # Generates synthetic sales.csv for testing
+│   ├── validate_sales_csv.py      # Validates sales.csv structure and sample values
+│   ├── handler.py                 # Lambda ETL logic
+│   └── sql/
+│       └── create_tables.sql      # Redshift/PostgreSQL schema
+├── tests/
+│   └── test_handler.py            # Unit tests for transformation logic
+├── template.yaml                  # AWS SAM/CloudFormation template
+└── sales.csv                      # Generated sample data (1M records)
+```
+
+## Usage Instructions
+
+### 1. Install Requirements
+```bash
+pip install -r requirements/base.txt
+pip install -r requirements/dev.txt  # For development/testing
+```
+
+### 2. Generate Sample Data
+```bash
+python src/generate_sales_csv.py
+```
+This creates `sales.csv` with 1,000,000 records matching the schema.
+
+### 3. Validate Sample Data
+```bash
+python src/validate_sales_csv.py
+```
+Checks column names, types, and sample values for accuracy.
+
+### 4. Run Unit Tests
+```bash
+pytest tests/test_handler.py
+```
+Validates transformation logic against business rules.
+
+### 5. Deploy Infrastructure
+Use `template.yaml` with AWS SAM or CloudFormation to deploy S3, Lambda, Redshift, etc.
+
+## Requirements
+
+**Base requirements:**
+- pandas
+- numpy
+- faker
+- boto3
+- psycopg2-binary
+
+**Development requirements:**
+- pytest
+
+## Data Schema
+
+| Field Name        | Data Type      | Description                       |
+|-------------------|---------------|-----------------------------------|
+| transaction_id    | INT           | Unique transaction identifier     |
+| order_id          | INT           | Order identifier                  |
+| customer_id       | INT           | Customer identifier (-1 if blank) |
+| product_id        | INT           | Product identifier                |
+| order_date        | TIMESTAMP     | Date and time of transaction      |
+| quantity          | INT           | Number of units sold              |
+| unit_price        | NUMERIC(10,2) | Price per unit                    |
+| product_category  | VARCHAR(50)   | Standardized product category     |
+| total_price       | NUMERIC(10,2) | Calculated total order value      |
+
+## Case Study
+See `Case_Study.md` for a real-world business scenario, transformation requirements, and desired outcomes.
+
+## Article & Documentation
+See the LaTeX and PDF files for the full journal article and technical documentation.
 AWS SAM/Serverless	Framework for deploying the serverless application infrastructure as code.
 
 ## Project Structure
